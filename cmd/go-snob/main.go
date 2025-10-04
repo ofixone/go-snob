@@ -7,6 +7,7 @@ import (
 	"go-snob/pkg/app"
 	"go-snob/pkg/recoverer"
 	"go-snob/pkg/restyprometheus"
+	"io"
 	"log"
 	"net/http"
 	"os/signal"
@@ -48,6 +49,21 @@ func main() {
 					return
 				}
 				logger.Info(res.String())
+			},
+			"/webhook": func(w http.ResponseWriter, r *http.Request) {
+				logger.Info("webhook called")
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					http.Error(w, "cannot read body", http.StatusBadRequest)
+					return
+				}
+				defer func(Body io.ReadCloser) {
+					_ = Body.Close()
+				}(r.Body)
+
+				logger.Info("webhook handled", zap.String("request", string(body)))
+
+				w.WriteHeader(http.StatusOK)
 			},
 		}),
 	).Run(ctx)
