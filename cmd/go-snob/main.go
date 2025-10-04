@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"go-snob/internal/vcs/gitea"
 	"go-snob/pkg/app"
 	"go-snob/pkg/recoverer"
+	"go-snob/pkg/restyprometheus"
 	"log"
+	"net/http"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -14,6 +17,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"resty.dev/v3"
 )
 
 const (
@@ -28,9 +32,24 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	defer cancel()
 
+	client := gitea.NewClient(
+		restyprometheus.NewClient(resty.New(), "go-snob", "public http"),
+		"http://localhost:3000/api/v1",
+		cfg.GiteaToken,
+	)
+
 	logger.Info("starting app init..")
 	err := app.NewApp(logger).WithModules(
-		NewHttpServer(logger, cfg.HTTPListenAddr),
+		NewHttpServer(logger, cfg.HTTPListenAddr).WithHandlers(map[string]func(w http.ResponseWriter, r *http.Request){
+			"/test": func(w http.ResponseWriter, r *http.Request) {
+				res, err := client.AddComment("order", "order", 1)
+				if err != nil {
+					logger.Error("failed to add comment", zap.Error(err))
+					return
+				}
+				logger.Info(res.String())
+			},
+		}),
 	).Run(ctx)
 	if err != nil {
 		logger.Fatal("app run failed", zap.Error(err))

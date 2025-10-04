@@ -12,6 +12,7 @@ import (
 type HTTPServer struct {
 	logger *zap.Logger
 	server *http.Server
+	mux    *http.ServeMux
 }
 
 func NewHttpServer(logger *zap.Logger, addr string) *HTTPServer {
@@ -33,8 +34,17 @@ func NewHttpServer(logger *zap.Logger, addr string) *HTTPServer {
 
 	return &HTTPServer{
 		logger: logger,
+		mux:    mux,
 		server: srv,
 	}
+}
+
+func (s *HTTPServer) WithHandlers(m map[string]func(ц http.ResponseWriter, r *http.Request)) *HTTPServer {
+	for pattern, handler := range m {
+		s.mux.HandleFunc(pattern, handler)
+	}
+
+	return s
 }
 
 func (s *HTTPServer) Run(_ context.Context) error {
