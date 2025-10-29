@@ -29,11 +29,15 @@ func (c *Client) newRequest() *resty.Request {
 		})
 }
 
-func (c *Client) AddComment(owner string, repo string, issueIndex int) (*resty.Response, error) {
+// AddComment добавляет комментарий к pull request / issue
+// owner - название проекта, где хранится репозиторий
+// repo - название репозитория
+// issueID - идентификатор pull request / issue
+func (c *Client) AddComment(owner string, repo string, issueID int) (*resty.Response, error) {
 	return c.newRequest().
 		SetBody(map[string]any{
 			"body": "Тестовый комментарий",
 		}).
-		SetPathParams(map[string]string{"owner": owner, "repo": repo, "index": strconv.Itoa(issueIndex)}).
+		SetPathParams(map[string]string{"owner": owner, "repo": repo, "index": strconv.Itoa(issueID)}).
 		Post(c.baseUrl + "/repos/{owner}/{repo}/issues/{index}/comments")
 }

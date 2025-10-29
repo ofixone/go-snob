@@ -7,5 +7,6 @@ type Config struct {
 
 	HTTPListenAddr string `long:"http-listen-addr" description:"Listening host:port for public http-server" env:"HTTP_LISTEN_ADDR" required:"true"`
 
-	GiteaToken string `long:"gitea-token" description:"Bot user Gitea token" env:"GITEA_TOKEN" required:"true"`
+	// SNOBUserGiteaToken SNOB user gitea. Used for calling api by himself
+	SNOBUserGiteaToken string `long:"snob-user-gitea-token" description:"User SNOB Gitea Token" env:"SNOB_USER_GITEA_TOKEN" required:"true"`
 }
