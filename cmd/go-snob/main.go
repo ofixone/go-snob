@@ -38,8 +38,8 @@ func main() {
 	//)
 
 	webhook := giteawebhook.NewWebhook(func(ctx context.Context, p giteawebhook.Payload) {
-		logger.Info(fmt.Sprintf("webhook payload from processor, wait 5 sec: %v", p))
-		time.Sleep(5 * time.Second)
+		logger.Info(fmt.Sprintf("webhook payload from processor, wait 10 sec: %v", p))
+		time.Sleep(10 * time.Second)
 		logger.Info(fmt.Sprintf("finish wait: %v", p))
 	}, logger).WithDebug().WithSecret(cfg.WebhookGiteaSecret)
 

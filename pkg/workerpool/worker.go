@@ -81,8 +81,18 @@ func (wp *Pool[P]) Start(ctx context.Context) {
 	}
 }
 
-func (wp *Pool[P]) Shutdown() {
+func (wp *Pool[P]) Shutdown(ctx context.Context) {
 	close(wp.payloadCh)
-	wp.wg.Wait()
-	wp.procWg.Wait()
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		wp.wg.Wait()
+		wp.procWg.Wait()
+	}()
+
+	select {
+	case <-done:
+	case <-ctx.Done():
+	}
 }

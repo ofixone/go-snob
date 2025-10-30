@@ -30,7 +30,7 @@ func (wh *Webhook) Run(ctx context.Context) error {
 
 func (wh *Webhook) Stop(ctx context.Context) error {
 	wh.logger.Info("stop handling webhook..")
-	wh.workers.Shutdown()
+	wh.workers.Shutdown(ctx)
 	wh.logger.Info("webhook handling stopped")
 	return nil
 }
