@@ -19,6 +19,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// TODO: need to go through whole code base and fix naming sometimes :)
+
 const (
 	Version = "0.1.0"
 )

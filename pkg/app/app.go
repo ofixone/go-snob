@@ -69,6 +69,10 @@ func (a *App) Run(ctx context.Context) error {
 
 func (a *App) Shutdown(ctx context.Context) error {
 	for _, module := range a.modules {
+		// TODO: add the possibility to shut them down via goroutines. For now, I've left only 5 seconds for stopping,
+		// which is probably not enough for the rest of the modules if one of them gets stuck.
+		// TODO: add the possibility to notify this function about an error during module cleanup.
+		// This could be useful if something goes wrong, so we can highlight it and terminate the app.
 		err := module.Stop(ctx)
 		if err != nil {
 			return fmt.Errorf("can't cleanup module: %w", err)
