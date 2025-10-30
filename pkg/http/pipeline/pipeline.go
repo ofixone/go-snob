@@ -49,6 +49,11 @@ func (p *Pipeline) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	next()
 }
 
+func (p *Pipeline) WithMiddlewares(mw ...MiddlewareFunc) *Pipeline {
+	p.middlewares = append(p.middlewares, mw...)
+	return p
+}
+
 type HandlerInOut[In any, Out any] func(ctx *Ctx, in In) (Out, error)
 type HandlerIn[In any] func(ctx *Ctx, in In) error
 type HandlerOut[Out any] func(ctx *Ctx) (Out, error)

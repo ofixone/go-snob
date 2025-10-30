@@ -1,2 +1,4 @@
 .idea
+cmd/go-snob/tmp/*
+!cmd/go-snob/tmp/.gitkeep
 vendor

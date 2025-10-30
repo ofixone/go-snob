@@ -33,7 +33,7 @@ func NewServer(logger *zap.Logger, addr string) *Server {
 
 func (s *Server) WithPingHandler() *Server {
 	return s.WithHandler("/ping", pipeline.NewPipeline(
-		pipeline.AllowMethods(http.MethodGet),
+		pipeline.AllowedMethods(http.MethodGet),
 	))
 }
 

@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	apihttpwebhook "go-snob/cmd/go-snob/api/http/webhook"
 	"go-snob/pkg/app"
+	"go-snob/pkg/giteawebhook"
 	"go-snob/pkg/http"
-	"go-snob/pkg/http/pipeline"
 	"go-snob/pkg/recoverer"
 	"log"
 	"os/signal"
@@ -22,10 +23,6 @@ const (
 	Version = "0.1.0"
 )
 
-type Test struct {
-	Bla string `json:"bla"`
-}
-
 func main() {
 	cfg := newCfg()
 	logger := newLogger(cfg.LogLevel)
@@ -40,16 +37,20 @@ func main() {
 	//	cfg.SNOBUserGiteaToken,
 	//)
 
+	webhook := giteawebhook.NewWebhook(func(ctx context.Context, p giteawebhook.Payload) {
+		logger.Info(fmt.Sprintf("webhook payload from processor, wait 5 sec: %v", p))
+		time.Sleep(5 * time.Second)
+		logger.Info(fmt.Sprintf("finish wait: %v", p))
+	}, logger).WithDebug().WithSecret(cfg.WebhookGiteaSecret)
+
+	server := apihttpwebhook.NewServer(webhook)
+
 	logger.Info("starting app init..")
 	err := app.NewApp(logger).WithModules(
-		http.NewServer(logger, cfg.HTTPListenAddr).WithPingHandler().WithHandler("/test", pipeline.NewPipeline(
-			pipeline.Out[*Test](pipeline.DecodeJSON[*Test]()),
-			pipeline.InOut[*Test, *Test](func(ctx *pipeline.Ctx, in *Test) (*Test, error) {
-				in.Bla += " in addition"
-				return in, nil
-			}),
-			pipeline.In[*Test](pipeline.EncodeJSON[*Test]()),
-		)),
+		http.NewServer(logger, cfg.HTTPListenAddr).
+			WithPingHandler().
+			WithHandler("/webhook", server.GiteaWebhook()),
+		webhook,
 	).Run(ctx)
 	if err != nil {
 		logger.Fatal("app run failed", zap.Error(err))
