@@ -29,6 +29,7 @@ func RawWebhookLog(logger *zap.Logger) pipeline.MiddlewareFunc {
 		// TODO: need to restore bytes cause reader has read them till EOF, have to think about good solution
 		ctx.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
+		// RawWebhookLog TODO: need to do something with this shit and path correct dir
 		if f, err := os.CreateTemp(".", "webhook_*.json"); err == nil {
 			_, _ = f.Write(buf.Bytes())
 			_ = f.Close()

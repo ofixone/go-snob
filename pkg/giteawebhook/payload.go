@@ -22,7 +22,11 @@ func (a Action) Validate() error {
 }
 
 type PullRequest struct {
-	ID int `json:"id"`
+	ID      int    `json:"id"`
+	DiffURL string `json:"diff_url"`
+	Head    struct {
+		SHA string `json:"sha"`
+	} `json:"head"`
 }
 
 type Owner struct {

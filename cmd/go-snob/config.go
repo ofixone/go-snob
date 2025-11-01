@@ -3,7 +3,8 @@ package main
 import "go.uber.org/zap/zapcore"
 
 type Config struct {
-	LogLevel zapcore.Level `long:"log-level" description:"Log level: panic, fatal, warn or warning, info, debug" env:"LOG_LEVEL" required:"true"`
+	PathToYAMLCfg string        `long:"path-to-yaml" description:"Path to YAML cfg" env:"PATH_TO_YAML_CFG" required:"true"`
+	LogLevel      zapcore.Level `long:"log-level" description:"Log level: panic, fatal, warn or warning, info, debug" env:"LOG_LEVEL" required:"true"`
 
 	HTTPListenAddr string `long:"http-listen-addr" description:"Listening host:port for public http-server" env:"HTTP_LISTEN_ADDR" required:"true"`
 
@@ -12,4 +13,10 @@ type Config struct {
 
 	// WebhookGiteaSecret webhook secret for HMAC signature
 	WebhookGiteaSecret string `long:"webhook-gitea-secret" description:"Webhook Gitea Secret" env:"WEBHOOK_GITEA_SECRET" required:"true"`
+	// CloudRuFoundationalModelsKey key to foundational models service provided by Cloud ru
+	CloudRuFoundationalModelsKey string `long:"cloud-ru-foundational-models-key" description:"CloudRuFoundationalModelsKey" env:"CLOUD_RU_FOUNDATIONAL_MODELS_KEY" required:"true"`
+}
+
+type YAMLConfig struct {
+	SystemPrompt string `yaml:"system_prompt"`
 }
